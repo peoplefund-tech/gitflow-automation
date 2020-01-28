@@ -6,23 +6,23 @@ gitflow의 여러 정책들을 자동화 해 주는 github action 입니다.
 
 ## 사용방법
 ```
-name: create-auto-pr
+name: gitflow-automation
 on:
   pull_request:
-      types: [closed]
+    types: [closed]
 jobs:
   create-auto-pr:
-    name: Create Auto PR
+    name: Gitflow Automation
     runs-on: ubuntu-latest
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      steps:
-        - name: cap-action
-          uses: riemannulus/auto-create-pr@master
-          env:
-            BRANCH_PREFIX: "hotfix/"
-            TARGET_BRANCH: "develop"
-            BASE_BRANCH: "master"
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: gitflow-automation
+        uses: peoplefund-tech/gitflow-automation@v0.1.0
+        env:
+          BRANCH_PREFIX: "hotfix/"
+          TARGET_BRANCH: "develop"
+          BASE_BRANCH: "master"
 ```
 - `BRANCH_PREFIX`: hotfix 브랜치의 prefix를 적어 주세요.
 - `TARGET_BRANCH`: automerge되어야 하는 브랜치를 적어주세요.
