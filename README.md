@@ -5,7 +5,7 @@ gitflow의 여러 정책들을 자동화 해 주는 github action 입니다.
 1. 특정 prefix가 붙은 브랜치가 base 브랜치에 머지되면 자동으로 target 브랜치에도 머지합니다.
 
 ## 사용방법
-```
+```yaml
 name: gitflow-automation
 on:
   pull_request:
