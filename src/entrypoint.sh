@@ -6,6 +6,9 @@ echo "Start Creating PR action"
 ##### CONSTANCE
 OUTPUT_PATH=".output"
 
+##### VARIABLE
+IS_NEED_APPROVE="false"
+
 ##### FUNCTION
 function create_pr()
 {
@@ -18,9 +21,9 @@ function create_pr()
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   "https://api.github.com/repos/$REPO_FULLNAME/pulls")
- echo "$SOURCE_BRANCH , $TARGET_BRANCH"
+ echo "head: $SOURCE_BRANCH, base: $TARGET_BRANCH"
+ echo "Create PR Response:"
  echo "Code : $RESPONSE_CODE"
- echo "$(cat $OUTPUT_PATH)"
  if [[ "$RESPONSE_CODE" != "201" ]];
  then
   exit 1
@@ -41,10 +44,22 @@ function merge_pr()
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   "https://api.github.com/repos/$REPO_FULLNAME/pulls/$PULL_NUMBER/merge")
- echo "Response:"
+ echo "Merged PR Response:"
  echo "Code : $RESPONSE_CODE"
- echo "Verbose:"
- echo "$(cat $OUTPUT_PATH)"
+}
+
+function approve_pr()
+{
+ REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")
+ PULL_NUMBER="$(jq -r ".number" "$OUTPUT_PATH" | head -1)"
+ RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}\n" \
+  --data "{\"event\":\"APPROVE\"}" \
+  -X POST \
+  -H "Authorization: token $BOT_TOKEN" \
+  -H "Accept: application/vnd.github.v3+json" \
+  "https://api.github.com/repos/$REPO_FULLNAME/pulls/$PULL_NUMBER/reviews")
+ echo "Approve PR Response:"
+ echo "Code : $RESPONSE_CODE"
 }
 
 function check_token_is_defined()
@@ -53,6 +68,17 @@ function check_token_is_defined()
   then
     echo "Undefined GITHUB_TOKEN environment variable."
     exit 1
+  fi
+}
+
+function check_bot_token_is_defined()
+{
+  if [[ "$BOT_TOKEN" != null ]];
+  then
+    echo "Bot Token Avaliable"
+    IS_NEED_APPROVE=true    
+  else
+    echo "Bot Token not Avaliable"
   fi
 }
 
@@ -90,6 +116,7 @@ function check_is_merged_base_branch_is_trigger()
 function check_validate() 
 {
   check_token_is_defined
+  check_bot_token_is_defined
   check_is_pr_is_merged
   check_is_pr_branch_has_prefix
   check_is_merged_base_branch_is_trigger
@@ -99,7 +126,11 @@ function check_validate()
 function main()
 {
   check_validate
-  create_pr  
+  create_pr 
+  if [[ "$IS_NEED_APPROVE" == "true" ]];
+  then
+    approve_pr
+  fi
   merge_pr
 }
 
