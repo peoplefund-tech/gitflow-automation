@@ -1,5 +1,5 @@
-name: "Auto Create PR and Merge"
-description: "Automatically merge pull requests that are ready"
+name: "Gitflow automation"
+description: "Gitflow automation"
 runs:
   using: "docker"
   image: "Dockerfile"

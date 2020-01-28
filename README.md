@@ -1,5 +1,8 @@
-# Gitflow hotfix automation
-gitflow hotfix의 귀찮은 merge 정책을 자동화해 주는 github action 입니다.
+# Gitflow automation
+gitflow의 여러 정책들을 자동화 해 주는 github action 입니다.
+
+## 기능들
+1. 특정 prefix가 붙은 브랜치가 base 브랜치에 머지되면 자동으로 target 브랜치에도 머지합니다.
 
 ## 사용방법
 ```
