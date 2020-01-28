@@ -21,6 +21,6 @@ jobs:
             TARGET_BRANCH: "develop"
             BASE_BRANCH: "master"
 ```
-`BRANCH_PREFIX`: hotfix 브랜치의 prefix를 적어 주세요.
-`TARGET_BRANCH`: automerge되어야 하는 브랜치를 적어주세요.
-`BASE_BRANCH`: event가 발생할 브랜치를 적어주세요.
+- `BRANCH_PREFIX`: hotfix 브랜치의 prefix를 적어 주세요.
+- `TARGET_BRANCH`: automerge되어야 하는 브랜치를 적어주세요.
+- `BASE_BRANCH`: event가 발생할 브랜치를 적어주세요.
