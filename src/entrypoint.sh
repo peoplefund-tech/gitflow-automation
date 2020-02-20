@@ -110,7 +110,7 @@ function check_is_pr_is_merged()
   fi
 }
 
-function check_is_pr_branch_has_hotfix_prefix()
+function check_is_pr_branch_has_prefix()
 {
   echo "$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")"
   if [[ "$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")" != "$HOTFIX_PREFIX"* ]];
