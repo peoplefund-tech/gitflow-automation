@@ -12,7 +12,7 @@ IS_NEED_APPROVE="false"
 ##### FUNCTION
 function create_pr()
 {
- TITLE="hotfix auto merged by $(jq -r ".pull_request.head.user.login" "$GITHUB_EVENT_PATH" | head -1)."
+ TITLE="[HOTFIX] auto merged by $(jq -r ".pull_request.user.login" "$GITHUB_EVENT_PATH" | head -1) into master."
  REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")
  SOURCE_BRANCH=$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")
  RESPONSE_CODE=$(curl -o $OUTPUT_PATH -s -w "%{http_code}\n" \
@@ -30,6 +30,24 @@ function create_pr()
  fi
 }
 
+function delete_branch()
+{
+ DELETE_URL="$(jq -r ".head.repo.git_refs_url" "$OUTPUT_PATH" | head -1)"
+ RESPONSE_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" \
+  -X DELETE \
+  -H "Authorization: token $GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github.v3+json" \
+  "$DELETE_URL")
+ echo "Delete branch:"
+ echo "used url: $DELETE_URL"
+ echo "Code : $RESPONSE_CODE"
+ if [[ "$RESPONSE_CODE" != "204" ]];
+ then
+  exit 1
+ fi
+
+}
+
 function merge_pr()
 {
  REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")
@@ -38,7 +56,7 @@ function merge_pr()
  HEAD_SHA="$(jq -r ".head.sha" "$OUTPUT_PATH" | head -1)"
  MERGE_METHOD="merge"
  PULL_NUMBER="$(jq -r ".number" "$OUTPUT_PATH" | head -1)"
- RESPONSE_CODE=$(curl -o $OUTPUT_PATH -s -w "%{http_code}\n" \
+ RESPONSE_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" \
   --data "{\"commit_title\":\"$COMMIT_TITLE\", \"commit_message\":\"$COMMIT_MESSAGE\", \"sha\": \"$HEAD_SHA\", \"merge_method\": \"$MERGE_METHOD\"}" \
   -X PUT \
   -H "Authorization: token $GITHUB_TOKEN" \
@@ -92,10 +110,10 @@ function check_is_pr_is_merged()
   fi
 }
 
-function check_is_pr_branch_has_prefix()
+function check_is_pr_branch_has_hotfix_prefix()
 {
   echo "$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")"
-  if [[ "$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")" != "$BRANCH_PREFIX"* ]];
+  if [[ "$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")" != "$HOTFIX_PREFIX"* ]];
   then
     echo "This PR head branch do not have prefix."
     exit 0
@@ -132,6 +150,7 @@ function main()
     approve_pr
   fi
   merge_pr
+  delete_branch
 }
 
 ##### EXECUTE
