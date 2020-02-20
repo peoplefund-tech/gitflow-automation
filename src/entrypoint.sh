@@ -32,12 +32,13 @@ function create_pr()
 
 function delete_branch()
 {
- DELETE_URL="$(jq -r ".head.repo.git_refs_url" "$OUTPUT_PATH" | head -1)"
+ REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")
+ SHA="$(jq -r ".head.sha" "$OUTPUT_PATH" | head -1)"
  RESPONSE_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" \
   -X DELETE \
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
-  "$DELETE_URL")
+  "https://api.github.com/repos/$REPO_FULLNAME/git/refs/$SHA")
  echo "Delete branch:"
  echo "used url: $DELETE_URL"
  echo "Code : $RESPONSE_CODE"
