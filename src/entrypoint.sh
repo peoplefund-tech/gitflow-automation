@@ -16,7 +16,7 @@ function create_pr()
  REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")
  SOURCE_BRANCH=$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")
  RESPONSE_CODE=$(curl -o $OUTPUT_PATH -s -w "%{http_code}\n" \
-  --data "{\"title\":\"$TITLE\", \"head\": \"$SOURCE_BRANCH\", \"base\": \"$TARGET_BRANCH\"}" \
+  --data "{\"title\":\"$TITLE\", \"head\": \"$BASE_BRANCH\", \"base\": \"$TARGET_BRANCH\"}" \
   -X POST \
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
