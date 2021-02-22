@@ -13,8 +13,7 @@ IS_NEED_APPROVE="false"
 function create_pr()
 {
  TITLE="hotfix auto merged by $(jq -r ".pull_request.head.user.login" "$GITHUB_EVENT_PATH" | head -1)."
- REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")
- SOURCE_BRANCH=$(jq -r ".pull_request.head.ref" "$GITHUB_EVENT_PATH")
+ REPO_FULLNAME=$(jq -r ".repository.full_name" "$GITHUB_EVENT_PATH")\
  RESPONSE_CODE=$(curl -o $OUTPUT_PATH -s -w "%{http_code}\n" \
   --data "{\"title\":\"$TITLE\", \"head\": \"$BASE_BRANCH\", \"base\": \"$TARGET_BRANCH\"}" \
   -X POST \
